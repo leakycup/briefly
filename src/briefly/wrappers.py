@@ -52,6 +52,22 @@ def simple_process(func):
   process_wrapper.__name__ = func.__name__
   return process_wrapper
 
+def configurable_process(func):
+  '''A configurable local running process.
+     The wrapped function is to configure() the process.
+  '''
+  class process_wrapper(process.SimpleProcess):
+    def configure(self):
+      super(process_wrapper, self).configure()
+      func(self, *self.args, **self.kargs)
+      assert self.func is not None, "please set self.func to the function to execute"
+
+    def do_execute(self):
+      self.func(self)
+
+  process_wrapper.__name__ = func.__name__
+  return process_wrapper
+
 def simple_hadoop_process(func):
   '''A simple hadoop jobs.
      The wrapped function is to configure the hadoop parameters.

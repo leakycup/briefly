@@ -19,14 +19,19 @@ import random
 from wrappers import *
 import process
 
-@simple_process
-def cat(self, *sources):
+def copy_input_to_output(self):
   '''Concatnate all sources'''
   for dep in self.deps:
     if dep.output is None:
       continue
     for line in self.read(dep.output):
       self.write('%s', line)
+
+@configurable_process
+def cat(self, *sources, **kwargs):
+  if 'output' in kwargs:
+    self.output = kwargs['output']
+  self.func = copy_input_to_output
 
 @simple_process
 def head(self, limit=10):
